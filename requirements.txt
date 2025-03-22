@@ -1,0 +1,5 @@
+PyNaCl
+discord
+yt-dlp
+pytube
+python-dotenv
