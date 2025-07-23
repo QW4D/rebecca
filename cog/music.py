@@ -49,6 +49,7 @@ class MusicCog(commands.Cog):
     @commands.hybrid_command()
     async def skip(self, ctx):
         vcid = ctx.author.voice.channel.id
+        await ctx.reply(f"Пропуск песни ** '{self.channel[vcid].current[0]['title']}' **")
         if self.channel[vcid].vc:
             self.channel[vcid].vc.stop()
             await self.play_song(ctx, connect=0)
@@ -82,6 +83,7 @@ class MusicCog(commands.Cog):
         vcid = ctx.author.voice.channel.id
         await self.channel[vcid].vc.disconnect()
         self.channel[vcid] = Channel()
+        await ctx.reply("Выхожу из войс чата")
 
 
     @commands.hybrid_command()
