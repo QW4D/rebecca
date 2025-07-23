@@ -41,7 +41,6 @@ class MusicCog(commands.Cog):
         song = await self.search(query)
 
         await ctx.reply(f"**'{song['title']}'** добавлена в очередь")
-
         await self.connect(ctx)
         self.channel[vcid].music_queue.append([song, ctx.author.voice.channel])
         if not self.channel[vcid].is_playing:
@@ -140,7 +139,7 @@ class MusicCog(commands.Cog):
                 await ctx.send(
                     f"**{len(self.channel[vcid].music_queue) + 1} ' {playlist.title}'** добавлен в очередь")
             else:
-                await ctx.send(f"РїР»РµР№Р»РёСЃС‚ **'{playlist.title}'** добавлен в очередь")
+                await ctx.send(f" **'{playlist.title}'** добавлен в очередь")
             try:
                 i = 0
                 for url in playlist:
@@ -161,14 +160,15 @@ class MusicCog(commands.Cog):
         vcid = before.channel.id
         await self.check_leave(vcid)
 
-    async def check_leave(self, ctx):
-        vcid = ctx.author.voice.channel.id
+    async def check_leave(self, vcid):
         if len(self.channel[vcid].vc.channel.members) == 1:
-            # await self.stop(vcid)
-            pass
+            await self.log(self.channel[vcid].vc.channel.members)
+            await self.channel[vcid].vc.disconnect()
+            self.channel[vcid] = Channel()
 
     async def play_song(self, ctx, connect=0):
         vcid = ctx.author.voice.channel.id
+        # mysterious stop
         self.channel[vcid].vc.stop()
         if len(self.channel[vcid].music_queue) > 0 or self.channel[vcid].loop:
             self.channel[vcid].is_playing = True
@@ -176,7 +176,7 @@ class MusicCog(commands.Cog):
             url = await self.get_song(ctx)
             if connect:
                 await self.connect(ctx)
-            await self.check_leave(ctx)
+            await self.check_leave(vcid)
 
             if not self.channel[vcid].loop or not os.path.exists(f'tmp/music/{vcid}.weba'):
                 await self.download(url, ctx)
@@ -197,11 +197,6 @@ class MusicCog(commands.Cog):
 
     @staticmethod
     async def search(query):
-        # for some reason doesn't work
-
-        # if query.startswith("https://"):
-        #     video = pytube.YouTube(query)
-        #     return {'url': video.watch_url, 'title': video.title}
         search = pytube.Search(query)
         return {'url': search.results[0].watch_url, 'title': search.results[0].title}
 
