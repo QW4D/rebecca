@@ -10,7 +10,7 @@ class MiscCog(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         await self.bot.change_presence(
-            activity=discord.Activity(type=discord.ActivityType.listening, name=f"{self.bot.command_prefix}help | bot"))
+            activity=discord.Activity(type=discord.ActivityType.listening, name=f"/help | bot"))
 
     @has_permissions(administrator=True)
     @commands.hybrid_command(name="sync", with_app_command=True)
